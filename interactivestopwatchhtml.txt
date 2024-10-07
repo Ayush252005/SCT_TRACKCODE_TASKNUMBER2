@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Stopwatch</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="dashboard">
+            <h1>Interactive Stopwatch</h1>
+            <div id="stopwatch-container" class="stopwatch">
+                <div id="display">00:00:00</div>
+                <button id="start">Start</button>
+                <button id="pause">Pause</button>
+                <button id="reset">Reset</button>
+                <button id="lap">Lap</button>
+                <div id="lap-count">Laps: 0</div>
+                <ul id="laps"></ul>
+                <div class="lap-section">
+                    <h2>Session History</h2>
+                    <ul id="history-list"></ul>
+                </div>
+                <button id="save-session">Save Session</button>
+                <button id="export-history">Export History</button>
+                <button id="voice-control">Voice Control</button>
+                <div id="voice-status"></div>
+                <label for="theme-selector">Select Theme: </label>
+                <select id="theme-selector">
+                    <option value="light">Light</option>
+                    <option value="dark">Dark</option>
+                    <option value="blue">Blue</option>
+                    <option value="purple">Purple</option>
+                </select>
+            </div>
+        </div>
+    </div>
+
+    <audio id="alert-sound" src="alert.mp3"></audio> <!-- Optional sound file -->
+    <script src="script.js"></script>
+</body>
+</html>

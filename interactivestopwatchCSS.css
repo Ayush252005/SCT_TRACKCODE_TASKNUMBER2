@@ -1,0 +1,108 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    margin: 0;
+    background-color: #f4f7fc;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.dashboard {
+    background-color: #eef2f7;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+}
+
+.stopwatch {
+    text-align: center;
+    background-color: #6a0dad;  /* Purple background */
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    color: white; /* White text for contrast */
+}
+
+#display {
+    font-size: 2.5em;
+    margin-bottom: 20px;
+}
+
+button {
+    padding: 10px 25px;
+    margin: 5px;
+    border: none;
+    background-color: #4CAF50; /* Green color for default buttons */
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+button:active {
+    background-color: #367c39;
+}
+
+#pause {
+    background-color: #f44336; /* Red color for pause button */
+}
+
+#pause:hover {
+    background-color: #e02f20;
+}
+
+#reset {
+    background-color: #2196F3; /* Blue color for reset button */
+}
+
+#reset:hover {
+    background-color: #0b7dda;
+}
+
+.lap-section {
+    margin-top: 20px;
+}
+
+.lap-section h2 {
+    margin-bottom: 10px;
+}
+
+.lap-section ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.lap-section ul li {
+    background-color: #ffcccb; /* Light pink background for lap items */
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 5px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    color: black; /* Black text for contrast */
+}
+
+/* Dynamic background change based on stopwatch status */
+body.running {
+    background-color: #e0f7fa; /* Light blue when running */
+}
+
+body.paused {
+    background-color: #fff9c4; /* Light yellow when paused */
+}
+
+body.reset {
+    background-color: #f4f7fc; /* Original background when reset */
+}

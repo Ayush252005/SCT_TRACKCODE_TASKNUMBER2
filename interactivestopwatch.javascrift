@@ -1,0 +1,169 @@
+let [hours, minutes, seconds] = [0, 0, 0];
+let timer = null; // Stores setInterval timer
+let running = false; // Is the stopwatch running?
+let lapCount = 0; // Lap count
+let laps = []; // Array to store lap times
+let sessions = []; // Array to store saved sessions
+
+const display = document.getElementById('display');
+const lapCountDisplay = document.getElementById('lap-count');
+const lapsList = document.getElementById('laps');
+const historyList = document.getElementById('history-list');
+const voiceStatus = document.getElementById('voice-status');
+
+// Load session history from localStorage if available
+if (localStorage.getItem('sessions')) {
+    sessions = JSON.parse(localStorage.getItem('sessions'));
+    updateHistoryDisplay();
+}
+
+// Start button logic
+document.getElementById('start').addEventListener('click', startStopwatch);
+document.getElementById('pause').addEventListener('click', pauseStopwatch);
+document.getElementById('reset').addEventListener('click', resetTimer);
+document.getElementById('lap').addEventListener('click', logLap);
+document.getElementById('save-session').addEventListener('click', saveSession);
+document.getElementById('export-history').addEventListener('click', exportHistory);
+document.getElementById('voice-control').addEventListener('click', setupVoiceControl);
+
+// Function to start the stopwatch
+function startStopwatch() {
+    if (!running) {
+        timer = setInterval(updateCountUp, 1000); // Starts the stopwatch
+        running = true; // Set the running flag to true
+        document.body.classList.add('running'); // Change body background
+    }
+}
+
+// Function to pause the stopwatch
+function pauseStopwatch() {
+    clearInterval(timer); // Stops the interval
+    running = false; // Set the running flag to false
+    document.body.classList.remove('running'); // Reset body background
+    document.body.classList.add('paused');
+}
+
+// Function to reset the stopwatch
+function resetTimer() {
+    clearInterval(timer); // Stops the interval
+    [hours, minutes, seconds] = [0, 0, 0]; // Reset time variables
+    running = false; // Set running flag to false
+    lapCount = 0; // Reset lap count
+    laps = []; // Clear laps
+    display.innerText = '00:00:00'; // Reset display
+    lapCountDisplay.innerText = 'Laps: 0'; // Reset lap display
+    lapsList.innerHTML = ''; // Clear laps display
+    document.body.classList.remove('running', 'paused'); // Reset background
+}
+
+// Function to log lap time
+function logLap() {
+    if (running) {
+        lapCount++;
+        const lapTime = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        laps.push(lapTime);
+        lapsList.innerHTML += `<li>Lap ${lapCount}: ${lapTime}</li>`;
+        lapCountDisplay.innerText = `Laps: ${lapCount}`;
+    }
+}
+
+// Function to update the display every second
+function updateCountUp() {
+    seconds++;
+    if (seconds === 60) {
+        seconds = 0;
+        minutes++;
+        if (minutes === 60) {
+            minutes = 0;
+            hours++;
+        }
+    }
+    display.innerText = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+}
+
+// Function to save session history to localStorage
+function saveSession() {
+    const session = {
+        hours,
+        minutes,
+        seconds,
+        laps: [...laps]
+    };
+    sessions.push(session);
+    localStorage.setItem('sessions', JSON.stringify(sessions));
+    updateHistoryDisplay();
+}
+
+// Function to update history display
+function updateHistoryDisplay() {
+    historyList.innerHTML = '';
+    sessions.forEach((session, index) => {
+        historyList.innerHTML += `<li>Session ${index + 1}: ${String(session.hours).padStart(2, '0')}:${String(session.minutes).padStart(2, '0')}:${String(session.seconds).padStart(2, '0')} with ${session.laps.length} laps</li>`;
+    });
+}
+
+// Function to export history
+function exportHistory() {
+    if (sessions.length === 0) {
+        alert('No sessions to export.');
+        return;
+    }
+    
+    // Prepare CSV data
+    let csvContent = "data:text/csv;charset=utf-8,Session Number,Hours,Minutes,Seconds,Laps\n";
+    sessions.forEach((session, index) => {
+        const lapsText = session.laps.join(' | ');
+        csvContent += `${index + 1},${session.hours},${session.minutes},${session.seconds},"${lapsText}"\n`;
+    });
+
+    // Create a link to download the CSV file
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "stopwatch_sessions.csv");
+    document.body.appendChild(link); // Required for Firefox
+    link.click(); // Trigger download
+    document.body.removeChild(link); // Clean up the link element
+}
+
+// Function to setup voice control
+function setupVoiceControl() {
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    
+    recognition.continuous = false; // Stop recognition after the first command
+    recognition.interimResults = false; // No interim results
+
+    recognition.onstart = function() {
+        voiceStatus.innerText = "Listening...";
+    };
+
+    recognition.onresult = function(event) {
+        const command = event.results[0][0].transcript.toLowerCase();
+        voiceStatus.innerText = `Command: ${command}`;
+
+        if (command.includes("start")) {
+            startStopwatch();
+        } else if (command.includes("pause")) {
+            pauseStopwatch();
+        } else if (command.includes("reset")) {
+            resetTimer();
+        } else if (command.includes("lap")) {
+            logLap();
+        } else if (command.includes("save session")) {
+            saveSession();
+        } else if (command.includes("export history")) {
+            exportHistory();
+        }
+    };
+
+    recognition.onerror = function(event) {
+        voiceStatus.innerText = `Error occurred in recognition: ${event.error}`;
+    };
+
+    recognition.onend = function() {
+        voiceStatus.innerText = "Stopped listening.";
+    };
+
+    recognition.start(); // Start the voice recognition
+}
